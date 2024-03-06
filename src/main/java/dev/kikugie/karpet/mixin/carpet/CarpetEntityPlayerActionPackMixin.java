@@ -1,4 +1,4 @@
-package dev.kikugie.karpet.mixin;
+package dev.kikugie.karpet.mixin.carpet;
 
 import carpet.helpers.EntityPlayerActionPack;
 import dev.kikugie.karpet.KarpetSettings;

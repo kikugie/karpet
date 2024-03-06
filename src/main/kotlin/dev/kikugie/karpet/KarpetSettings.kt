@@ -12,14 +12,14 @@ object KarpetSettings {
     @JvmField
     @Rule(
         category = [Reference.MOD_ID, RuleCategory.FEATURE],
-        desc = "Allow botting only yourself and accounts linked by server admins."
+        desc = "Allow botting only yourself and accounts linked by server admins"
     )
     var allowOnlyOwnedBots = false
 
     @JvmField
     @Rule(
         category = [Reference.MOD_ID, RuleCategory.FEATURE],
-        desc = "Limit the amount of bots on the server. Admins bypass this restriction.",
+        desc = "Limit the amount of bots on the server. Admins bypass this restriction",
         strict = false,
         options = ["-1"],
         validate = [BotLimitValidator::class]
@@ -36,22 +36,25 @@ object KarpetSettings {
     )
     var botTeam = "OFF"
 
+    @JvmField
+    @Rule(
+        category = [Reference.MOD_ID, RuleCategory.FEATURE],
+        desc = "Prevents end pillar generation from filling unnecessary air blocks around them"
+    )
+    var noEndPillarFill = false
+
     private object BotLimitValidator : Validator<Int>() {
-        override fun validate(source: ServerCommandSource?, rule: CarpetRule<Int>, new: Int, str: String): Int? {
-            if (new < -1) return null
-            limitBots = new
-            return new
-        }
+        override fun validate(source: ServerCommandSource?, rule: CarpetRule<Int>, new: Int, str: String): Int? =
+            if (new < -1) null else new
 
         override fun description() = "Value must be -1 for no limits, 0 to disallow new bots or >1"
     }
 
     private object TeamValidator : Validator<String>() {
-        override fun validate(source: ServerCommandSource?, rule: CarpetRule<String>, new: String, str: String): String? {
-            if (new == "OFF") return new
-            val teams = source?.teamNames?: return null
-            return if (new in teams) new else null
+        override fun validate(source: ServerCommandSource?, rule: CarpetRule<String>, new: String, str: String) = when {
+            source == null -> new
+            new == "OFF" -> new
+            else -> if (new in source.teamNames) new else null
         }
-
     }
 }

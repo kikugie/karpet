@@ -1,4 +1,4 @@
-package dev.kikugie.karpet.mixin;
+package dev.kikugie.karpet.mixin.carpet;
 
 import carpet.CarpetSettings;
 import carpet.commands.PlayerCommand;
@@ -38,8 +38,8 @@ public abstract class CarpetPlayerCommandMixin {
     @Unique
     private static boolean allowOriginal(ServerCommandSource source) {
         return !KarpetSettings.allowOnlyOwnedBots
-                || !source.isExecutedByPlayer()
-                || CommandHelper.canUseCommand(source, CarpetSettings.carpetCommandPermissionLevel);
+                || !source.isExecutedByPlayer();
+//                || CommandHelper.canUseCommand(source, CarpetSettings.carpetCommandPermissionLevel);
     }
 
     @WrapOperation(method = "lambda$register$1", at = @At(value = "INVOKE", target = "Lcarpet/commands/PlayerCommand;getPlayerSuggestions(Lnet/minecraft/server/command/ServerCommandSource;)Ljava/util/Collection;"))
