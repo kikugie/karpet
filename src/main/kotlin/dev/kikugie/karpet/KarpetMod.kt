@@ -41,7 +41,7 @@ object KarpetMod : ModInitializer, CarpetExtension {
     }
 
     override fun onPlayerLoggedIn(player: ServerPlayerEntity) {
-        if (KarpetSettings.botTeam != "OFF" && player is EntityPlayerMPFake)
+        if (KarpetSettings.botTeam.isNotEmpty() && player is EntityPlayerMPFake)
             player.addTeam(KarpetSettings.botTeam)
         else
             player.removeTeam(KarpetSettings.botTeam)

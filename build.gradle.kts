@@ -17,7 +17,7 @@ val mod = ModData()
 val mcVersion = stonecutter.current.version
 val mcDep = property("mod.mc_dep").toString()
 
-version = "${mod.id}.v+$mcVersion"
+version = "${mod.version}+$mcVersion"
 group = mod.group
 base { archivesName.set(mod.id) }
 

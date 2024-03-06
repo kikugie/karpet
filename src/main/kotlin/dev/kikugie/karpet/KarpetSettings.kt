@@ -34,7 +34,7 @@ object KarpetSettings {
         options = ["OFF"],
         validate = [TeamValidator::class]
     )
-    var botTeam = "OFF"
+    var botTeam = ""
 
     @JvmField
     @Rule(
@@ -51,10 +51,8 @@ object KarpetSettings {
     }
 
     private object TeamValidator : Validator<String>() {
-        override fun validate(source: ServerCommandSource?, rule: CarpetRule<String>, new: String, str: String) = when {
-            source == null -> new
-            new == "OFF" -> new
-            else -> if (new in source.teamNames) new else null
+        override fun validate(source: ServerCommandSource?, rule: CarpetRule<String>, new: String, str: String): String? {
+            return if (new == "OFF") "" else new
         }
     }
 }

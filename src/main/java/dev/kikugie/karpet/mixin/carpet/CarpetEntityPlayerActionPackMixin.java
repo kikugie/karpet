@@ -21,7 +21,7 @@ public class CarpetEntityPlayerActionPackMixin {
 
     @Inject(method = "start", at = @At("RETURN"))
     private void addTeam(EntityPlayerActionPack.ActionType type, EntityPlayerActionPack.Action action, CallbackInfoReturnable<EntityPlayerActionPack> cir) {
-        if (!actions.isEmpty() && !KarpetSettings.botTeam.equals("OFF"))
+        if (!actions.isEmpty() && !KarpetSettings.botTeam.isEmpty())
             TeamUtil.addTeam(player, KarpetSettings.botTeam);
     }
 
