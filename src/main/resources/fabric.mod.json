@@ -12,26 +12,22 @@
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
   "license": "CC0-1.0",
-  "icon": "assets/template/icon.png",
+  "icon": "assets/karpet/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.example.TemplateMod"
-    ],
-    "client": [
-      "com.example.TemplateModClient"
+      {
+        "adapter": "kotlin",
+        "value": "dev.kikugie.karpet.KarpetMod"
+      }
     ]
   },
   "mixins": [
-    "template.mixins.json",
-    {
-      "config": "template.client.mixins.json",
-      "environment": "client"
-    }
+    "karpet.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15",
     "minecraft": "${mcdep}",
-    "fabric-api": "*"
+    "fabric-language-kotlin": ">=1.10"
   }
 }

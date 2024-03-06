@@ -1,5 +1,6 @@
 plugins {
     `maven-publish`
+    kotlin("jvm") version "1.9.22"
     id("fabric-loom")
     id("me.modmuss50.mod-publish-plugin")
     id("me.fallenbreath.yamlang")
@@ -11,7 +12,7 @@ class ModData {
     val version = property("mod.version").toString()
     val group = property("mod.group").toString()
 }
-
+val kotlin = "1.9.22"
 val mod = ModData()
 val mcVersion = stonecutter.current.version
 val mcDep = property("mod.mc_dep").toString()
@@ -40,6 +41,7 @@ repositories {
         forRepository { maven("https://api.modrinth.com/maven") { name = "Modrinth" } }
         filter { includeGroup("maven.modrinth") }
     }
+    maven("https://masa.dy.fi/maven") { name = "Masa Maven" }
 }
 
 dependencies {
@@ -50,8 +52,10 @@ dependencies {
     minecraft("com.mojang:minecraft:${mcVersion}")
     mappings("net.fabricmc:yarn:${mcVersion}+build.${property("deps.yarn_build")}:v2")
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${property("deps.flk")}+kotlin.$kotlin")
 
-    modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+//    modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+    modImplementation("maven.modrinth:carpet:${property("deps.carpet")}")
 }
 
 loom {
