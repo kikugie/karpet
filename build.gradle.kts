@@ -1,9 +1,7 @@
 plugins {
     `maven-publish`
     kotlin("jvm") version "1.9.22"
-    id("fabric-loom")
-    id("me.modmuss50.mod-publish-plugin")
-    id("me.fallenbreath.yamlang")
+    id("fabric-loom") version "1.6-SNAPSHOT"
 }
 
 class ModData {
@@ -14,10 +12,9 @@ class ModData {
 }
 val kotlin = "1.9.22"
 val mod = ModData()
-val mcVersion = stonecutter.current.version
 val mcDep = property("mod.mc_dep").toString()
 
-version = "${mod.version}+$mcVersion"
+version = mod.version
 group = mod.group
 base { archivesName.set(mod.id) }
 
@@ -49,26 +46,13 @@ dependencies {
         modules.forEach { fabricApi.module(it, "${property("deps.fapi")}") }
     }
 
-    minecraft("com.mojang:minecraft:${mcVersion}")
-    mappings("net.fabricmc:yarn:${mcVersion}+build.${property("deps.yarn_build")}:v2")
+    minecraft("com.mojang:minecraft:${mcDep}")
+    mappings("net.fabricmc:yarn:${mcDep}+build.${property("deps.yarn_build")}:v2")
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${property("deps.flk")}+kotlin.$kotlin")
 
 //    modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
-    modImplementation("maven.modrinth:carpet:${property("deps.carpet")}")
-}
-
-loom {
-    runConfigs.all {
-        ideConfigGenerated(stonecutter.current.isActive)
-        vmArgs("-Dmixin.debug.export=true")
-        runDir = "../../run"
-    }
-}
-
-yamlang {
-    targetSourceSets.set(mutableListOf(sourceSets["main"]))
-    inputDir.set("assets/${mod.id}/lang")
+    modImplementation("carpet:fabric-carpet:${property("deps.carpet")}")
 }
 
 java {
@@ -90,57 +74,3 @@ tasks.processResources {
 
     filesMatching("fabric.mod.json") { expand(map) }
 }
-
-publishMods {
-    file = tasks.remapJar.get().archiveFile
-    additionalFiles.from(tasks.remapSourcesJar.get().archiveFile)
-    displayName = "${mod.name} ${mod.version} for $mcVersion"
-    version = mod.version
-    changelog = rootProject.file("CHANGELOG.md").readText()
-    type = STABLE
-    modLoaders.add("fabric")
-
-    dryRun = providers.environmentVariable("MODRINTH_TOKEN")
-        .getOrNull() == null || providers.environmentVariable("CURSEFORGE_TOKEN").getOrNull() == null
-
-    modrinth {
-        projectId = property("publish.modrinth").toString()
-        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-        minecraftVersions.add(mcVersion)
-        requires {
-            slug = "fabric-api"
-        }
-    }
-
-    curseforge {
-        projectId = property("publish.curseforge").toString()
-        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-        minecraftVersions.add(mcVersion)
-        requires {
-            slug = "fabric-api"
-        }
-    }
-}
-/*
-publishing {
-    repositories {
-        maven("...") {
-            name = "..."
-            credentials(PasswordCredentials::class.java)
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
-        }
-    }
-
-    publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = "${property("mod.group")}.${mod.id}"
-            artifactId = mod.version
-            version = mcVersion
-
-            from(components["java"])
-        }
-    }
-}
-*/

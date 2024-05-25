@@ -29,19 +29,9 @@ object KarpetSettings {
     @JvmField
     @Rule(
         category = [Reference.MOD_ID, RuleCategory.FEATURE],
-        desc = "Team assigned to self-botted and fake players",
-        strict = false,
-        options = ["OFF"],
-        validate = [TeamValidator::class]
+        desc = "Prevents end pillar generation from filling unnecessary air blocks around them"
     )
-    var botTeam = ""
-
-//    @JvmField
-//    @Rule(
-//        category = [Reference.MOD_ID, RuleCategory.FEATURE],
-//        desc = "Prevents end pillar generation from filling unnecessary air blocks around them"
-//    )
-//    var noEndPillarFill = false
+    var noEndPillarFill = false
 
     private object BotLimitValidator : Validator<Int>() {
         override fun validate(source: ServerCommandSource?, rule: CarpetRule<Int>, new: Int, str: String): Int? =

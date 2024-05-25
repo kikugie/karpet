@@ -6,13 +6,12 @@ import carpet.patches.EntityPlayerMPFake;
 import carpet.utils.CommandHelper;
 import carpet.utils.Messenger;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import dev.kikugie.karpet.KarpetMod;
 import dev.kikugie.karpet.KarpetSettings;
+import dev.kikugie.karpet.LinkedAccountManager;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,11 +41,12 @@ public abstract class CarpetPlayerCommandMixin {
                 || CommandHelper.canUseCommand(source, CarpetSettings.carpetCommandPermissionLevel);
     }
 
-    @WrapOperation(method = "lambda$register$1", at = @At(value = "INVOKE", target = "Lcarpet/commands/PlayerCommand;getPlayerSuggestions(Lnet/minecraft/server/command/ServerCommandSource;)Ljava/util/Collection;"))
-    private static Collection<String> listAllowedPlayers(ServerCommandSource source, Operation<Collection<String>> original) {
-        return allowOriginal(source)
-                ? original.call(source)
-                : KarpetMod.getAllowedTargets(source.getName());
+    @Inject(method = "getPlayerSuggestions", at = @At("HEAD"), cancellable = true)
+    private static void listAllowedPlayers(ServerCommandSource source, CallbackInfoReturnable<Collection<String>> cir) {
+        if (!allowOriginal(source)) {
+            cir.setReturnValue(LinkedAccountManager.getAllowedTargets(source.getName()));
+            cir.cancel();
+        }
     }
 
     @Inject(method = "cantSpawn", at = @At("HEAD"), cancellable = true)
@@ -66,7 +66,7 @@ public abstract class CarpetPlayerCommandMixin {
         }
 
         var playerName = StringArgumentType.getString(context, "player");
-        if (!KarpetMod.getAllowedTargets(context.getSource().getName()).contains(playerName)) {
+        if (!LinkedAccountManager.getAllowedTargets(context.getSource().getName()).contains(playerName)) {
             Messenger.m(context.getSource(), "r Player %s is not owned".formatted(playerName));
             cir.setReturnValue(true);
             cir.cancel();
@@ -77,7 +77,7 @@ public abstract class CarpetPlayerCommandMixin {
     private static void restrictPlayerManipulate(CommandContext<ServerCommandSource> context, CallbackInfoReturnable<Boolean> cir) {
         var playerName = StringArgumentType.getString(context, "player");
         if (allowOriginal(context.getSource())) return;
-        if (!KarpetMod.getAllowedTargets(context.getSource().getName()).contains(playerName)) {
+        if (!LinkedAccountManager.getAllowedTargets(context.getSource().getName()).contains(playerName)) {
             Messenger.m(context.getSource(), "r Player %s is not owned".formatted(playerName));
             cir.setReturnValue(true);
             cir.cancel();
@@ -86,16 +86,28 @@ public abstract class CarpetPlayerCommandMixin {
 
     @ModifyExpressionValue(method = "register", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/builder/RequiredArgumentBuilder;then(Lcom/mojang/brigadier/builder/ArgumentBuilder;)Lcom/mojang/brigadier/builder/ArgumentBuilder;", ordinal = 1), remap = false)
     private static ArgumentBuilder<ServerCommandSource, ?> linkAltAccount(ArgumentBuilder<ServerCommandSource, ?> original) {
-        return original.then(literal("link")
-                .requires(source -> CommandHelper.canUseCommand(source, CarpetSettings.carpetCommandPermissionLevel))
-                .then(argument("alt", StringArgumentType.word())
-                        .suggests((c, b) -> CommandSource.suggestMatching(Objects.requireNonNull(getPlayerSuggestions(c.getSource())), b))
-                        .executes(context -> {
-                            var p1 = StringArgumentType.getString(context, "player");
-                            var p2 = StringArgumentType.getString(context, "alt");
-                            KarpetMod.linkPlayers(p1, p2);
-                            Messenger.m(context.getSource(), "w Linked %s - %s".formatted(p1, p2));
-                            return 1;
-                        })));
+        return original
+                .then(literal("link")
+                        .requires(source -> CommandHelper.canUseCommand(source, CarpetSettings.carpetCommandPermissionLevel))
+                        .then(argument("alt", StringArgumentType.word())
+                                .suggests((c, b) -> CommandSource.suggestMatching(Objects.requireNonNull(getPlayerSuggestions(c.getSource())), b))
+                                .executes(context -> {
+                                    var p1 = StringArgumentType.getString(context, "player");
+                                    var p2 = StringArgumentType.getString(context, "alt");
+                                    LinkedAccountManager.linkPlayers(p1, p2);
+                                    Messenger.m(context.getSource(), "w Linked %s - %s".formatted(p1, p2));
+                                    return 1;
+                                })))
+                .then(literal("unlink")
+                        .requires(source -> CommandHelper.canUseCommand(source, CarpetSettings.carpetCommandPermissionLevel))
+                        .then(argument("alt", StringArgumentType.word())
+                                .suggests((c, b) -> CommandSource.suggestMatching(LinkedAccountManager.getAllowedTargets(StringArgumentType.getString(c, "player")), b))
+                                .executes(context -> {
+                                    var p1 = StringArgumentType.getString(context, "player");
+                                    var p2 = StringArgumentType.getString(context, "alt");
+                                    LinkedAccountManager.unlinkPlayers(p1, p2);
+                                    Messenger.m(context.getSource(), "w Unlinked %s - %s".formatted(p1, p2));
+                                    return 1;
+                                })));
     }
 }
