@@ -1,7 +1,7 @@
 plugins {
     `maven-publish`
-    kotlin("jvm") version "1.9.22"
-    id("fabric-loom") version "1.6-SNAPSHOT"
+    kotlin("jvm") version "2.1.0"
+    id("fabric-loom") version "1.9-SNAPSHOT"
 }
 
 class ModData {
@@ -10,7 +10,7 @@ class ModData {
     val version = property("mod.version").toString()
     val group = property("mod.group").toString()
 }
-val kotlin = "1.9.22"
+val kotlin = "2.1.0"
 val mod = ModData()
 val mcDep = property("mod.mc_dep").toString()
 
