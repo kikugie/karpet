@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Optional;
 
-@Mixin(value = EntityPlayerMPFake.class, remap = false)
+@Mixin(value = EntityPlayerMPFake.class)
 public class EntityPlayerMPFakeMixin {
     @ModifyExpressionValue(method = "createFake", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/UserCache;findByName(Ljava/lang/String;)Ljava/util/Optional;"))
     private static Optional<GameProfile> modifyFinalGP(Optional<GameProfile> original, @Local(argsOnly = true) String name) {
