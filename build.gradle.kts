@@ -1,23 +1,13 @@
 plugins {
-    `maven-publish`
-    kotlin("jvm") version "2.1.0"
-    id("fabric-loom") version "1.9-SNAPSHOT"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
+    id("fabric-loom") version "1.11-SNAPSHOT"
 }
 
-class ModData {
-    val id = property("mod.id").toString()
-    val name = property("mod.name").toString()
-    val version = property("mod.version").toString()
-    val group = property("mod.group").toString()
-}
-val kotlin = "2.1.0"
-val mod = ModData()
-val mcDep = property("mod.mc_dep").toString()
-
-version = mod.version
-group = mod.group
-base { archivesName.set(mod.id) }
-
+version = property("mod.version") as String
+group = property("mod.group") as String
+base.archivesName = property("mod.id") as String
+project.
 loom {
     splitEnvironmentSourceSets()
 
@@ -42,16 +32,12 @@ repositories {
 }
 
 dependencies {
-    fun fapiModules(vararg modules: String) {
-        modules.forEach { fabricApi.module(it, "${property("deps.fapi")}") }
-    }
-
-    minecraft("com.mojang:minecraft:${mcDep}")
-    mappings("net.fabricmc:yarn:${mcDep}+build.${property("deps.yarn_build")}:v2")
+    minecraft("com.mojang:minecraft:${property("mod.mc_dep")}")
+    mappings("net.fabricmc:yarn:${property("mod.mc_dep")}+build.${property("deps.yarn_build")}:v2")
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${property("deps.flk")}+kotlin.$kotlin")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${property("deps.flk")}")
 
-//    modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+    modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
     modImplementation("carpet:fabric-carpet:${property("deps.carpet")}")
 }
 
@@ -60,16 +46,16 @@ java {
 }
 
 tasks.processResources {
-    inputs.property("id", mod.id)
-    inputs.property("name", mod.name)
-    inputs.property("version", mod.version)
-    inputs.property("mcdep", mcDep)
+    inputs.property("id", project.property("mod.id"))
+    inputs.property("name", project.property("mod.name"))
+    inputs.property("version", project.property("mod.version"))
+    inputs.property("mcdep", project.property("mod.mc_dep"))
 
     val map = mapOf(
-        "id" to mod.id,
-        "name" to mod.name,
-        "version" to mod.version,
-        "mcdep" to mcDep
+        "id" to project.property("mod.id"),
+        "name" to project.property("mod.name"),
+        "version" to project.property("mod.version"),
+        "mcdep" to project.property("mod.mc_dep")
     )
 
     filesMatching("fabric.mod.json") { expand(map) }
