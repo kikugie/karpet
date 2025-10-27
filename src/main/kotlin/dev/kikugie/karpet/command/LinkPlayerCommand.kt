@@ -10,6 +10,8 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import dev.kikugie.karpet.KarpetMod
 import dev.kikugie.karpet.KarpetSettings
+import dev.kikugie.karpet.impldep.silk.get
+import dev.kikugie.karpet.impldep.silk.literal
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.server.command.ServerCommandSource
 

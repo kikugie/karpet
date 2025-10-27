@@ -6,8 +6,7 @@
     "EnderDragonSpawnStateMixin",
     "EndSpikeFeatureMixin",
     "authlib.GameProfileAccessor",
-    "carpet.CarpetPlayerCommandMixin",
-    "carpet.EntityPlayerMPFakeMixin"
+    "carpet.CarpetPlayerCommandMixin"
   ],
   "injectors": {
     "defaultRequire": 1

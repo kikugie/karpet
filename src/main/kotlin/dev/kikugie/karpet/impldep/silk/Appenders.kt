@@ -1,12 +1,10 @@
-package dev.kikugie.karpet.command
+package dev.kikugie.karpet.impldep.silk
 
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.ArgumentCommandNode
 import com.mojang.brigadier.tree.LiteralCommandNode
-import dev.kikugie.karpet.impldep.silk.ArgumentCommandBuilder
-import dev.kikugie.karpet.impldep.silk.LiteralCommandBuilder
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.CommandSource
 import net.minecraft.command.PermissionLevelSource
